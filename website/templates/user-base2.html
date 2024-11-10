@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  {% block css %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user-base2.css') }}">
+</head>
+<body {% if current_user and current_user.theme %} class="dark-mode" {% endif %}>
+
+  <header>
+    {% block top_left %}{% endblock %}
+
+    <!-- Display flashed messages -->
+    <div class="flash-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            <div class="flash-div error">
+              <div class="flash-message">
+                <img src="{{ url_for('static', filename='images/error_flash.png') }}" alt="Flash Error">
+                <h5>Error! {{ message }}</h5>
+              </div>
+              <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+              <div class="progress-bar"></div> <!-- Progress bar element -->
+            </div>
+          {% elif category == 'success' %}
+            <div class="flash-div success">
+              <div class="flash-message">
+                <img src="{{ url_for('static', filename='images/success_flash.png') }}" alt="Flash Success">
+                <h5>Success! {{ message }}</h5>
+              </div>
+              <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+              <div class="progress-bar"></div> <!-- Progress bar element -->
+            </div>
+          {% elif category == 'warning' %}
+            <div class="flash-div warning">
+              <div class="flash-message">
+                <img src="{{ url_for('static', filename='images/warning_flash.png') }}" alt="Flash Warning">
+                <h5>Warning! {{ message }}</h5>
+              </div>
+              <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+              <div class="progress-bar"></div> <!-- Progress bar element -->
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endwith %}
+    </div>
+
+    {% block top_right %}{% endblock %}
+  </header>
+
+  {% block main %}{% endblock %}
+
+  <!-- JavaScript to handle flash message progress bar -->
+  <script src="{{ url_for('static', filename='js/flash-progress-bar.js') }}"></script>
+
+</body>
+</html>

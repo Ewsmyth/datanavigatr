@@ -1,0 +1,449 @@
+{% extends 'user-base2.html' %}
+
+{% block title %}
+  Help
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user-help.css') }}">
+{% endblock %}
+
+{% block top_left %}
+  <a class="back-icon" href="{{ url_for('user.user_home', username=username) }}"></a>
+{% endblock %}
+
+{% block main %}
+
+<main>
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="booleanLogic">Boolean Logic:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A system of algebraic operations that uses true/false values to define relationships between different conditions. Allowable boolean operators are: AND, OR, NOT. The AND operators requires all specified conditions must be true for a record to be included in the results. The OR operator requires at least one of the specified conditions must be true (this could also be both/all conditions). The NOT operator excludes records that meet the specified condition.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="condition">Condition:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A condition is a specified relationship between a <a href="#dataFieldName">Data Field Name</a> and a <a href="#dataValue">Data Value</a> defined by an <a href="#operator">Operator</a>. An example of a condition is: {{ "TX_USER_ID==(user1<reporterID>)" | e }}</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="content">CONTENT:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The content of an online interaction.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="contentId">CONTENT_ID:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A unique numerical identifier associated to a specific record of user uploaded data.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Creating a Mission:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Create a mission by selecting the 3 vertical dots icon on the top right of the screen and then select "Mission". Assign a name to our mission, provide a brief explanation/justification, and then share the mission with other users. When creating queries you can select which mission to save it under and all members of that mission can view that query.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="dataField">Data Field:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A set of similar values arranged in a table (i.e. a column in a database).</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="dataFieldName">Data Field Name:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The name of a <a href="#dataField">Data Field</a>. Data Field Names are as follows: <br> 
+        <a href="#id">id</a>, <br> 
+        <a href="#txUserId">TX_USER_ID</a>, <br> 
+        <a href="#rxUserId">RX_USER_ID</a>, <br> 
+        <a href="#txAssocUsrnm">TX_ASSOC_USRNM</a>, <br>
+        <a href="#event">EVENT</a>, <br>
+        <a href="#txAssocEmail">TX_ASSOC_EMAIL</a>, <br>
+        <a href="#txAssocPasswd">TX_ACCT_PASSWD</a>, <br>
+        <a href="#txAcctAuth">TX_ACCT_AUTH</a>, <br>
+        <a href="#txCtlBy">TX_CTL_BY</a>, <br>
+        <a href="#txAssocTeam">TX_ASSOC_TEAM</a>, <br>
+        <a href="#txAssocFname">TX_ASSOC_FNAME</a>, <br>
+        <a href="#txAssocLname">TX_ASSOC_LNAME</a>, <br>
+        <a href="#txAcctStatus">TX_ACCT_STATUS</a>, <br>
+        <a href="#txAssocPhone">TX_ASSOC_PHONE</a>, <br>
+        <a href="#location">LOCATION</a>, <br>
+        <a href="#financeId">FINANCE_ID</a>, <br>
+        <a href="#contentId">CONTENT_ID</a>, <br>
+        <a href="#media">MEDIA</a>, <br>
+        <a href="#groupParticipants">GROUP_PARTICIPANTS</a>, <br>
+        <a href="#groupChatName">GROUP_CHAT_NAME</a>, <br>
+        <a href="#content">CONTENT</a>, <br>
+        <a href="#upTime">UP_TIME</a>, <br>
+        <a href="#initialTime">INITIAL_TIME</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="dataRecord">Data Record:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A single set of related <a href="#dataField">Data Fields</a> within a database, representing a unique entry.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="dataValue">Data Value:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Specific content stored within a <a href="#dataField">Data Field</a> for a given <a href="#record">Record</a></p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Dark Mode:</h2>
+    </div>
+    <div class="definition-block">
+      <p>To change from light mode to dark and back select the 3 vertical dots on the top right then select "Settings", you can then select the theme you prefer.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Deleting a Saved Machine:</h2>
+    </div>
+    <div class="definition-block">
+      <p>To delete a saved machine you can right-click on the machine you wish to delete then select delete.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="event">EVENT:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The type of event for a <a href="dataRecord">Data Record</a>.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Exporting Query Results:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Query results can be exported to a .xlsx file by clicking the Export on the top right. The Export function will only export the result that are currently displayed on the page and in the format of the page.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="financeId">FINANCE_ID:</h2>
+    </div>
+    <div class="definition-block">
+      <p>User submitted banking information.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="groupChatName">GROUP_CHAT_NAME:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A user assigned name of a group chat in Reporter.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="groupParticipants">GROUP_PARTICIPANTS:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A list of user IDs associated to a group chat in Reporter.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="id">id:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The unique identifier for a <a href="dataRecord">Data Record</a>.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Ingest:</h2>
+    </div>
+    <div class="definition-block">
+      <p>As of the current version of DataNaviGatr ingestion only works with Reporter databases. To ingest data from a Reporter database you need to navigate to the ingest page by click on the 3 vertical dots on the top right of the home page then select "Ingest". The Ingest page allows you to SSH into the machine that is running Reporter and export the database into QDB1. You can also save your machine's profile for quick and easy ingest operations.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="initialTime">INITIAL_TIME:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The time a <a href="dataRecord">Data Record</a> was first submitted to the database, if no value refer to the <a href="initialTime">INITIAL_TIME</a>.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="location">LOCATION:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A location specified by user submitted data, not a location request from the device itself.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Machine Name:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The Machine Name input is a user preference input, it's only purpose is allow you to assign names to machines for easy reference. The machine name is not used in the data ingestion process, so you can make it what ever you want.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="media">MEDIA:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The file name of upload images and videos. Future updates will display the actual content.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="operator">Operator:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Values used to define the relationship between different types of data. Allowable operators are: == (equals), = (contains), != (does not equal), < (less than), > (greater than).</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Path to .db File:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The file path to the .db (SQLite database file type) file of the website being ingested. All of the sites this system is meant to work with store their .db file in the Docker volumes directory (/var/lib/docker/volumes/), each database volume is typically named after the website followed by -data (I.E. reporter-data). Docker volumes also create another sub-directory name "_data", that is where the .db files should be if the sites were set up correctly. An example of the entire input could look like this: "/var/lib/docker/volumes/reporter-data/_data/reporter-data.db" (ps: The quotations are not part of the file path).</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>QDB1:</h2>
+    </div>
+    <div class="definition-block">
+      <p>QDB1 or Queryable Database 1 is where all ingested data is stored and queried. The purpose of QDB1 is to translate different databases into one uniform system that can be easily referenced.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Query Parameters:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The query parameters is a structured grouping of <a href="#condition">Conditions</a> and <a href="booleanLogic">Boolean Operators</a>. The proper query structure is condition {{ "<space>" | e }} boolean operator {{ "<space>" | e }} condition etc... An example could look like this: {{ "TX_USER_ID==(user1<reporterID>)" | e }} AND CONTENT=(hello)</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Query View:</h2>
+    </div>
+    <div class="definition-block">
+      <p>When veiwing query results you can re-arange the table by left-click-hold-and-drag.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="rxUserId">RX_USER_ID:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A unique numerical identifier assigned by the server for a user's account that is not visable to the user.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Saving a Machine:</h2>
+    </div>
+    <div class="definition-block">
+      <p>To save a machine in the ingest page, enter the parameters of the machine you want to ingest data from then select the "Save Parameters" button on the bottom left.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>Server IP:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Internet Protocol (IP) address of the machine that is running the website in which you want ingest data from.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>SQL Query:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The SQL Query that reformats the ingested data into QDB1's format. You can create your own SQL Query by creating a new ingestion query but you should not have to.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>SSH Password:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The password for the SSH Username account.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2>SSH Username:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The SSH Username input is the username for the machine that you are attempting to pull the data from. Because most ingestion for the sites that this system is designed for are Docker containers it is easiest to enable root login and root SSH on the machine running the sites; this allows you to ingest data with the root user and avoid issues with not having access to the proper directories.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAcctAuth">TX_ACCT_AUTH:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The authority of a user's account assigned by administrative users.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAcctPasswd">TX_ACCT_PASSWD:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Password assigned by the user and hashed by the server.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAcctStatus">TX_ACCT_STATUS:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A true/false value that determines a user's account status. 1 typically meaning active and 0 typically meaning de-activated.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocEmail">TX_ASSOC_EMAIL:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Unique identifier assigned by the user to authenticate with the server, is visible to the user.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocFname">TX_ASSOC_FNAME:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The firstname associated to a user's account, this is assigned by the user and is not unique.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocLname">TX_ASSOC_LNAME:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The lastname associated to a user's account, this is assigned by the user and is not unique.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocPhone">TX_ASSOC_PHONE:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A user assigned phone number associated to a user's account.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocTeam">TX_ASSOC_TEAM:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A group of online users to which a specific <a href="tx_userId">TX_USER_ID</a> is a part of.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txAssocUsrnm">TX_ASSOC_USRNM:</h2>
+    </div>
+    <div class="definition-block">
+      <p>Unique identifier assigned by the user to authenticate with the server, is visable to the user.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txCtlBy">TX_CTL_BY:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A unique numerical identifier of a user that manages the account of the given <a href="txUserId">TX_USER_ID</a> in a specific <a href="dataRecord">Data Record</a>.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="txUserId">TX_USER_ID:</h2>
+    </div>
+    <div class="definition-block">
+      <p>A unique numerical identifier assigned by the server for a user's account that is not visable to the user.</p>
+    </div>
+  </div>
+
+  <div class="entry-block">
+    <div class="title-block">
+      <h2 id="upTime">UP_TIME:</h2>
+    </div>
+    <div class="definition-block">
+      <p>The time the event took place or the most recent time of <a href="dataRecord">Data Record</a> update.</p>
+    </div>
+  </div>
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'admin-base.html' %}
+
+{% block title %}
+  Edit {{ user_to_edit.username }}
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-edit-user.css') }}">
+{% endblock %}
+
+{% block banner %}
+  Edit {{ user_to_edit.username }}
+{% endblock %}
+
+{% block content %}
+<form action="{{ url_for('admin.update_user_info', username=username, user_id=user_to_edit.id) }}" method="post">
+  <label for="username-fr-user">Username:</label>
+  <input type="text" name="username-fr-user" id="username" value="{{ user_to_edit.username }}" placeholder="Username" required>
+  <br>
+  <label for="email-fr-user">Email:</label>
+  <input type="email" name="email-fr-user" id="email" value="{{ user_to_edit.email }}" placeholder="Email" required>
+  <br>
+  <label for="password-fr-user">Password:</label>
+  <input type="password" name="password-fr-user" id="password" placeholder="Leave blank if no change.">
+  <br>
+  <label for="auth-fr-user">Authority:</label>
+  <select name="auth-fr-user" id="auth">
+    <option value="user" {% if user_to_edit.auth %}selected{% endif %}>User</option>
+    <option value="admin" {% if user_to_edit.auth %}selected{% endif %}>Admin</option>
+  </select>
+  <br>
+  <label for="firstname-fr-user">Firstname:</label>
+  <input type="text" name="firstname-fr-user" id="firstname" value="{{ user_to_edit.firstname }}" placeholder="Firstname" required>
+  <br>
+  <label for="lastname-fr-user">Lastname:</label>
+  <input type="text" name="lastname-fr-user" id="lastname" value="{{ user_to_edit.lastname }}" placeholder="Lastname" required>
+  <br>
+  <label for="status-fr-user">Account Status:</label>
+  <select name="status-fr-user" id="status">
+    <option value="True" {% if user_to_edit.is_active %}selected{% endif %}>Activated</option>
+    <option value="False" {% if not user_to_edit.is_active %}selected{% endif %}>Deactivated</option>
+  </select>
+  <br>
+  <label for="them-fr-user">Theme:</label>
+  <input type="checkbox" name="theme-fr-user" id="theme" value="{{ user_to_edit.theme }}">
+  <br>
+  <input type="submit" value="Update User Info">
+</form>
+{% endblock %}

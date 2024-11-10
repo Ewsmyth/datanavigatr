@@ -1,0 +1,64 @@
+{% extends 'user-base.html' %}
+
+{% block content %}
+<div class="sub-main-content">
+  <div class="table-container">
+      <table id="dynamic-table">
+          <thead>
+              <tr id="table-head">
+                {% for header in headers %}
+                  <th data-column="{{ loop.index0 }}">
+                    <h4>{{ header }}</h4>
+                  </th>
+                {% endfor %}
+              </tr>
+          </thead>
+          <tbody class="main-table">
+              {% for row in results %}
+              <tr>
+                {% for value in row.values() %}
+                  <td>
+                    <h4>{{ value }}</h4>
+                  </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+  
+  <!-- Pagination controls -->
+  <div class="pagination-controls">
+    <label for="page-size">Rows/page:</label>
+    <select id="page-size">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="all" selected>All</option>
+    </select>
+  </div>
+</div>
+<div class="export-control">
+  <button onclick="exportTableToExcel()">Export</button>
+</div>
+
+<!-- Popup Modal -->
+<div id="row-modal" class="modal">
+  <div class="modal-content">
+    <span id="close-modal" class="close">&times;</span>
+    <div id="modal-data"></div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user-view-query.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="{{ url_for('static', filename='js/advanced-table.js') }}"></script>
+{% endblock %}

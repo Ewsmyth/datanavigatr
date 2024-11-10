@@ -1,0 +1,46 @@
+<!-- templates/auth-login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-login.css') }}">
+</head>
+<body>
+  <div class="main-logo-div">
+    <h1>DataNaviGatr</h1>
+  </div>
+  <div class="login-container">
+    <form method="POST" action="{{ url_for('auth.auth_login') }}" class="login-form">
+      {{ form.hidden_tag() }} <!-- CSRF Token -->
+
+      <h2>Login</h2>
+      <div class="input-group">
+        {{ form.username.label }} {{ form.username(size=32) }}
+      </div>
+
+      <div class="input-group password-group">
+        {{ form.password.label }} {{ form.password(size=32) }}
+        <span class="toggle-password" onclick="togglePassword()">
+          <img id="eye-icon" src="{{ url_for('static', filename='images/visibility-off.png') }}" alt="Show/Hide Password">
+        </span>
+      </div>
+
+      <button type="submit" class="login-btn">{{ form.submit() }}</button>
+    </form>
+    
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
+  
+  <script src="{{ url_for('static', filename='js/auth-login.js') }}"></script>
+</body>
+</html>

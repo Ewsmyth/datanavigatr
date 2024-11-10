@@ -1,0 +1,109 @@
+:root {
+    --navbar: #d4d4d4;
+    --bg-color: #ffffff;
+    --resize-handle: #00000049;
+    --navbar-hovers: #a8a8a8;
+    --navbar-text-color: #1f1f1f;
+    --popup-bg-color: #000000c0;
+    --table-odds: #ffffff;
+    --table-evens: #d6d6d6;
+    --table-text: #2b2b2b;
+    --back-icon: url('../images/back-icon-black.png');
+    --add-memeber-icon: url('../images/add-member-black.png');
+    --help-icon: url('../images/help-black.png');
+    --add-dude-btn: #b4b4b4;
+    --bg-error: rgba(255, 0, 0, 0.479);
+    --text-error: rgb(102, 0, 0);
+    --bg-warning: rgba(255, 160, 0, 0.479);
+    --text-warning: rgb(160, 109, 0);
+    --bg-success: rgba(102, 255, 0, 0.479);
+    --text-success: rgb(59, 160, 0);
+}
+body.dark-mode {
+    --navbar: #2b2b2b;
+    --bg-color: #1f1f1f;
+    --resize-handle: #ffffff49;
+    --navbar-hovers: #555555;
+    --navbar-text-color: #ffffff;
+    --popup-bg-color: #b8b8b89c;
+    --table-odds: #272727;
+    --table-evens: #3f3f3f;
+    --table-text: #bbbbbb;
+    --back-icon: url('../images/back-icon-white.png');
+    --add-memeber-icon: url('../images/add-member-white.png');
+    --help-icon: url('../images/help-white.png');
+    --add-dude-btn: #383838;
+    --bg-error: rgba(252, 95, 95, 0.589);
+    --text-error: rgb(255, 171, 171);
+    --bg-warning: rgba(252, 189, 95, 0.589);
+    --text-warning: rgb(255, 228, 171);
+    --bg-success: rgba(139, 252, 95, 0.589);
+    --text-success: rgb(209, 255, 171);
+}
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+}
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    background-color: var(--navbar);
+}
+header .back-icon {
+    background-image: var(--back-icon);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 48px;
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+}
+header .back-icon:hover {
+    background-color: var(--navbar-hovers);
+}
+main {
+    display: flex;
+    flex-direction: column;
+    margin: 50px 0 0 0;
+    padding: 10px 10px 0 20px;
+}
+.entry-block {
+    display: flex;
+    margin: 0 0 30px 0;
+    border-bottom: 1px solid var(--table-text);
+    padding: 0 0 15px 0;
+}
+.title-block {
+    width: 25%;
+    display: flex;
+    align-items: start;
+    justify-content: right;
+    min-width: 320px;
+}
+.definition-block {
+    width: 75%;
+}
+.title-block h2 {
+    margin: 2px 7px 5px 0;
+    font-family: sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--table-text);
+}
+.definition-block p {
+    margin: 6px 0 2px 2px;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--table-text);
+}
+.entry-block .definition-block p a {
+    color: var(--navbar-text-color);
+}

@@ -1,0 +1,159 @@
+.new-user-div {
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    z-index: 1001;
+    height: 60px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.new-user-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 50px;
+    border-radius: 10px;
+    position: relative;
+}
+.new-user-link img {
+    height: 40px;
+    width: 40px;
+}
+.new-user-link .new-user-hover {
+    display: none;
+    position: absolute;
+    bottom: 15px;
+    left: -70px;
+    transform: translateX(-50%);
+    background-color: #333333;
+    color: #ffffff;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+.new-user-link:hover {
+    background-color: #333333;
+}
+.new-user-link:hover .new-user-hover {
+    display: block;
+}
+table {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid red;
+    border-collapse: collapse;
+}
+th, td {
+    border-left: 1px solid #6e6e6e;
+    border-right: 1px solid #6e6e6e;
+    border-top: 2px solid #6e6e6e;
+    border-bottom: 2px solid #6e6e6e;
+    padding: 6px;
+    color: #ffffff;
+}
+td {
+    cursor: pointer;
+}
+tbody tr:hover{
+    background-color: #333333;
+}
+
+
+/* Style for the create new user pop-up */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background-color: #1f1f1fd2;
+}
+.modal-content {
+    background-color: #1f1f1f;
+    margin: 0;
+    padding: 20px;
+    box-shadow: 0 0 10px #6e6e6e;
+    left: 30%;
+    top: 25%;
+    position: relative;
+    width: 40%;
+    height: 50%;
+    border-radius: 20px;
+    text-align: center;
+}
+.modal-content h2 {
+    color: #ffffff;
+    font-family: sans-serif;
+    font-weight: 800;
+    font-size: 34px;
+}
+.close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: 900;
+}
+.close:hover,
+.close:focus {
+    color: #7e7e7e;
+    text-decoration: none;
+    cursor: pointer;
+}
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    margin: 15px;
+    align-items: center;
+}
+.modal-content form input[type='text'],
+.modal-content form input[type='email'],
+.modal-content form input[type='password'],
+.modal-content form select {
+    width: 350px;
+    height: 26px;
+    font-size: 18px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #7e7e7e;
+    margin: 15px 0;
+    color: #ffffff;
+
+}
+.modal-content form input[type='text']:focus,
+.modal-content form input[type='email']:focus,
+.modal-content form input[type='password']:focus {
+    border-bottom: 2px solid #ffffff;
+}
+.modal-content form input[type='text']:focus::placeholder,
+.modal-content form input[type='email']:focus::placeholder,
+.modal-content form input[type='password']:focus::placeholder {
+    color: #ffffff;
+}
+.modal-content form select option {
+    background-color: #1f1f1f;
+    color: #ffffff;
+}
+.modal-content form input[type='submit'] {
+    margin: 20px;
+    font-size: 19px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: none;
+    background-color: #333333;
+    font-family: sans-serif;
+    color: #ffffff;
+    font-weight: 800;
+    cursor: pointer;
+
+}
+.modal-content form input[type='submit']:hover {
+    background-color: #7e7e7e;
+}

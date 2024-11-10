@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  {% block css %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user-base.css') }}">
+</head>
+<body {% if current_user and current_user.theme %} class="dark-mode" {% endif %}>
+
+  <!-- Navbar -->
+  <header id="navbar">
+    <a href="{{ url_for('user.user_home', username=username) }}">
+      <h1 class="navbar-brand">DataNaviGatr</h1>
+    </a>
+    
+  <!-- Display flashed messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="flash-div error">
+            <div class="flash-message">
+              <img src="{{ url_for('static', filename='images/error_flash.png') }}" alt="Flash Error">
+              <h5>Error! {{ message }}</h5>
+            </div>
+            <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+            <div class="progress-bar"></div> <!-- Progress bar element -->
+          </div>
+        {% elif category == 'success' %}
+          <div class="flash-div success">
+            <div class="flash-message">
+              <img src="{{ url_for('static', filename='images/success_flash.png') }}" alt="Flash Success">
+              <h5>Success! {{ message }}</h5>
+            </div>
+            <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+            <div class="progress-bar"></div> <!-- Progress bar element -->
+          </div>
+        {% elif category == 'warning' %}
+          <div class="flash-div warning">
+            <div class="flash-message">
+              <img src="{{ url_for('static', filename='images/warning_flash.png') }}" alt="Flash Warning">
+              <h5>Warning! {{ message }}</h5>
+            </div>
+            <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+            <div class="progress-bar"></div> <!-- Progress bar element -->
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+    <div class="nav-buttons">
+      <a class="user-help-btn" href="{{ url_for('user.user_help', username=username) }}"></a>
+      <button id="dropdown-toggle">
+        <img id="more-icon-black" src="{{ url_for('static', filename='images/user-more-vert-white.png') }}" alt="More">
+        <img id="more-icon-white" src="{{ url_for('static', filename='images/user-more-vert-black.png') }}" alt="More">
+      </button>
+      <!-- Dropdown Menu -->
+      <div id="dropdown-menu" class="dropdown-menu">
+        <button class="dropdown-item" id="new-query-btn">New Query</button>
+        <button class="dropdown-item" id="new-mission-btn">New Mission</button>
+        <a href="{{ url_for('user.user_ingest', username=username) }}">
+          <button class="dropdown-item">Ingest</button>
+        </a>
+        <button class="dropdown-item" id="settings-btn">Settings</button>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Popup Modals -->
+  <div id="new-query-popup" class="popup">
+    <div class="popup-content">
+      <div class="popup-banner">
+        <h2>Create New Query</h2>
+        <span class="close" id="new-query-close">&times;</span>
+      </div>
+      <form action="{{ url_for('user.user_new_query', username=username) }}" method="post">
+        <div class="form-values">
+          <div class="left-side-parameters">
+            <input type="text" name="query-name-fr-usr" placeholder="Query Name..." required>
+            <label for="assigned-mission-fr-usr">Mission:</label>
+            <select name="assigned-mission-fr-usr" required>
+              {% for mission in missions %}
+                <option value="{{ mission.id }}">{{ mission.mission_name }}</option>
+              {% endfor %}
+            </select>
+            <label class="date-labels" for="start-date-fr-usr">Start Date:</label>
+            <input type="date" name="start-date-fr-usr" required>
+            <label for="start-time-fr-usr">Start Time:</label>
+            <input type="time" name="start-time-fr-usr" required>
+            <label class="date-labels" for="end-date-fr-usr">End Date:</label>
+            <input type="date" name="end-date-fr-usr" required>
+            <label for="end-time-fr-usr">End Time:</label>
+            <input type="time" name="end-time-fr-usr" required>
+          </div>
+          <div class="right-side-parameters">
+            <label class="justif-label" for="justification-fr-usr">Justification:</label>
+            <textarea class="justif-text" name="justification-fr-usr" required></textarea>
+            <label class="param-label" for="query-parameters-fr-usr">Parameters:</label>
+            <textarea class="param-text" name="query-parameters-fr-usr"></textarea>
+          </div>
+        </div>
+        <div class="submit-div">
+          <input type="submit">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="new-mission-popup" class="popup">
+    <div class="popup-content">
+      <div class="popup-banner">
+        <h2>Create a New Mission</h2>
+        <span class="close" id="new-mission-close">&times;</span>
+      </div>
+      <form action="{{ url_for('user.create_new_mission', username=current_user.username) }}" method="POST">
+
+        <div class="form-values">
+          <div class="left-side-parameters">
+            <input type="text" name="mission-name-fr-usr" placeholder="Mission Name..." required>
+          </div>
+          <div class="right-side-parameters">
+            <label class="justif-label" for="mission-justification-fr-usr">Mission Justification:</label>
+            <textarea name="mission-justification-fr-usr" required></textarea>
+            <div id="member-inputs">
+              <label class="mission-label" for="mission-members">Mission Members:</label>
+              <div>
+                <input type="text" name="mission-members" placeholder="Enter a username"> <!-- Corrected name -->
+              </div>
+            </div>
+            <button type="button" id="add-member-btn">
+              <div class="add-member-icon"></div>
+              <h3>Add a Member</h3>
+            </button>
+          </div>
+        </div>
+        <div class="submit-div">
+          <input type="submit" value="Create Mission">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="settings-popup" class="popup">
+    <div class="popup-content">
+      <div class="popup-banner">
+        <h2>Settings</h2>
+        <span class="close" id="settings-close">&times;</span>
+      </div>
+      <form action="{{ url_for('user.user_update_account', username=current_user.username) }}" method="POST">
+        <div class="acct-settings-form-inputs">
+          <div class="acct-settings-div">
+            <label for="new-username-fr-usr">Username:</label>
+            <input type="text" name="new-username-fr-usr" value="{{ current_user.username }}">
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-email-fr-usr">Email:</label>
+            <input type="email" name="new-email-fr-usr" value="{{ current_user.email }}">
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-password-fr-usr">Password:</label>
+            <input type="password" name="new-password-fr-usr" placeholder="Enter new password">
+          </div>
+          <div class="acct-settings-div">
+            <label for="confirm-new-password-fr-usr">Confirm Password:</label>
+            <input type="password" name="confirm-new-password-fr-usr" placeholder="Confirm new password">
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-firstname-fr-usr">Firstname:</label>
+            <input type="text" name="new-firstname-fr-usr" value="{{ current_user.firstname }}">
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-lastname-fr-usr">Lastname:</label>
+            <input type="text" name="new-lastname-fr-usr" value="{{ current_user.lastname }}">
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-status-fr-usr">Account Status:</label>
+            <select name="new-status-fr-usr">
+                <option value="1" {% if current_user.is_active %}selected{% endif %}>Activated</option>
+                <option value="0" {% if not current_user.is_active %}selected{% endif %}>Deactivated</option>
+            </select>
+          </div>
+          <div class="acct-settings-div">
+            <label for="new-theme-fr-user">Theme:</label>
+            <select name="new-theme-fr-user">
+                <option value="0" {% if not current_user.theme %}selected{% endif %}>Light Mode</option>
+                <option value="1" {% if current_user.theme %}selected{% endif %}>Dark Mode</option>
+            </select>
+          </div>
+        </div>
+    
+        <div class="submit-div">
+          <input type="submit" value="Update Account">
+        </div>
+      </form>    
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <!-- Display the list of missions and their queries -->
+    <ul class="main-ul">
+      {% for mission in missions %}
+        <li>
+          <!-- Mission name that can be clicked to toggle queries -->
+          <span class="mission-toggle" data-mission-id="mission-{{ mission.id }}">{{ mission.mission_name }}</span>
+          
+          <!-- Query list, initially hidden -->
+          <ul id="mission-{{ mission.id }}" class="query-list" style="display: none;">
+            {% for query in mission.querys_mission %}
+              <!-- Query link that directs to the view_query route -->
+              <li>
+                <a href="{{ url_for('user.view_query', username=username, query_id=query.id) }}">
+                  <h4>{{ query.query_name }}</h4>
+                  <div class="results-div">
+                    <h6>{{ query.total_results or 0 }}</h6>
+                  </div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+    <div id="resize-handle"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main-content">{% block content %}{% endblock %}</main>
+
+
+  {% block scripts %}{% endblock %}
+  <!-- JavaScript to handle sidebar resizing -->
+  <script src="{{ url_for('static', filename='js/user-base.js') }}"></script>
+  <!-- JavaScript to handle dropdown -->
+  <script src="{{ url_for('static', filename='js/user-base-dropdown.js') }}"></script>
+  <!-- JavaScript to handle mission member inputs -->
+  <script src="{{ url_for('static', filename='js/add-usrnm-inputs.js') }}"></script>
+  <!-- JavaScript to handle mission toggle for query display -->
+  <script src="{{ url_for('static', filename='js/mission-toggle.js') }}"></script>
+  <!-- JavaScript to handle flash message progress bar -->
+  <script src="{{ url_for('static', filename='js/flash-progress-bar.js') }}"></script>
+</body>
+</html>

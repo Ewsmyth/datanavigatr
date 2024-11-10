@@ -1,0 +1,74 @@
+{% extends 'admin-base.html' %}
+
+{% block title %}
+  Admin Users
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-users.css') }}">
+{% endblock %}
+
+{% block banner %}
+  Admin Users
+{% endblock %}
+
+{% block content %}
+<div class="new-user-div">
+  <a href="javascript:void(0);" class="new-user-link" id="openModal">
+    <img src="{{ url_for('static', filename='images/admin-new-user.png') }}" alt="New User">
+    <span class="new-user-hover">Create New User</span>
+  </a>
+</div>
+
+<div id="userModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Create a new user</h2>
+    <form action="{{ url_for('admin.admin_create_user', username=username) }}" method="post">
+      <input type="text" name="username-fr-user" placeholder="*Username" required>
+      <input type="email" name="email-fr-user" placeholder="*Email" required>
+      <select name="authority-fr-user" required>
+        <option value="user" selected>User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <input type="password" name="password-fr-user" placeholder="*Password" required>
+      <input type="submit" value="Create New User">
+    </form>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>USER_ID</th>
+      <th>USERNAME</th>
+      <th>EMAIL</th>
+      <th>AUTH</th>
+      <th>FIRSTNAME</th>
+      <th>LASTNAME</th>
+      <th>ACCOUNT_STATUS</th>
+      <th>ACCOUNT_CREATED</th>
+      <th>LAST_UPDATE</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr class="user-row" data-url="{{ url_for('admin.admin_edit_user', username=user.username, user_id=user.id) }}">
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.auth }}</td>
+        <td>{{ user.firstname }}</td>
+        <td>{{ user.lastname }}</td>
+        <td>{{ user.is_active }}</td>
+        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>{{ user.updated_at.strftime('%Y-%m-%d') }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script src="{{ url_for('static', filename='js/j-query.js') }}"></script>
+<script src="{{ url_for('static', filename='js/create-user-pop-up.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tr-click.js') }}"></script>
+{% endblock %}

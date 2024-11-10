@@ -1,0 +1,243 @@
+{% extends 'user-base2.html' %}
+
+{% block title %}
+  Ingest Data
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user-ingest.css') }}">
+{% endblock %}
+
+{% block top_left %}
+  <a class="back-icon" href="{{ url_for('user.user_home', username=username) }}"></a>
+{% endblock %}
+
+{% block top_right %}
+  <a class="new-ingest-query" href="{{ url_for('user.user_ingest_query', username=current_user.username) }}"></a>
+{% endblock %}
+
+{% block main %}
+
+<!-- Context menu for deletion -->
+<div id="contextMenu" class="context-menu">
+  <div class="context-menu-option" onclick="deleteRow()">Delete</div>
+</div>
+
+<main>
+  <!-- Form to input SSH and database details -->
+  <form class="main-form" id="mainForm" action="{{ url_for('user.handle_ingest', username=current_user.username) }}" method="POST">
+    <div class="label-input-group top-item">
+      <label for="machine_name">Machine Name:</label>
+      <input type="text" id="machine_name" name="machine_name" placeholder="Machine Name..." required>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>Machine Name:</h1>
+        <p>Assign a name to the machine, this name is not required for SSH connection.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
+      <label for="username">SSH Username:</label>
+      <input type="text" id="username" name="username" placeholder="SSH Username..." required>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>SSh Username:</h1>
+        <p>Enter the username for the account you intend to SSH into.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
+      <label for="password">SSH Password:</label>
+      <input type="password" id="password" name="password" placeholder="SSH Password..." required>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>SSH Password:</h1>
+        <p>Enter the password for the user you intend to login to.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
+      <label for="ip">Server IP:</label>
+      <input type="text" id="ip" name="ip" placeholder="Server IP..." required>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>Server IP</h1>
+        <p>Enter the IP for the server that you intend to SSH into.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
+      <label for="db_file_path">Path to .db File:</label>
+      <input type="text" id="db_file_path" name="db_file_path" placeholder="Path to .db File..." required>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>File Path to .db</h1>
+        <p>Enter the file path for location of the .db file. Common example: /var/lib/docker/volumes/path/to/file.db.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
+      <label for="sql_query">SQL Query:</label>
+      <select name="sql_query" id="sql_query" required>
+        {% for query in queries %}
+          <option value="{{ query.sql_query }}">{{ query.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>SQL Query:</h1>
+        <p>Select the query for the app you intend to ingest. If there is no pre-built query you can create a new ingest query by selecting the icon in the top right.</p>
+      </span>
+    </div>
+
+    <div class="submission-div">
+      <input type="submit" id="saveButton" value="Save Parameters" onclick="setFormAction('save')">
+      <input type="submit" id="ingestButton" value="Ingest Data" onclick="setFormAction('ingest')">
+    </div>
+  </form>
+
+  <div class="table-div">
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <h4>Machine Name</h4>
+          </th>
+          <th>
+            <h4>SSH Username</h4>
+          </th>
+          <th>
+            <h4>SSH Password</h4>
+          </th>
+          <th>
+            <h4>Server IP</h4>
+          </th>
+          <th>
+            <h4>DB File Path</h4>
+          </th>
+          <th>
+            <h4>SQL Query</h4>
+          </th>
+          <th>
+            <h4>Created At</h4>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for machine in remote_machines %}
+          <tr onclick="populateForm(this)" oncontextmenu="showContextMenu(event, '{{ machine.id }}')">
+            <td>
+              <h4>{{ machine.machine_name }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.machine_username }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.machine_password }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.machine_ip }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.machine_file_path }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.ingest_query.name if machine.ingest_query else 'N/A' }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.created_at.strftime('%Y-%m-%d %H:%M') }}</h4>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7">
+              <h5>You have no saved machines.</h5>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- JavaScript to handle form population and deletion -->
+<script>
+  let selectedRowId = null;
+
+  function setFormAction(action) {
+      const form = document.getElementById('mainForm');
+
+      if (action === 'ingest') {
+        form.action = "{{ url_for('user.handle_ingest', username=current_user.username) }}";
+      } else if (action === 'save') {
+        form.action = "{{ url_for('user.save_remote_machine', username=current_user.username) }}";
+      }
+  }
+
+  function populateForm(row) {
+      // Deselect all rows first
+      document.querySelectorAll('tr.selected-row').forEach(r => r.classList.remove('selected-row'));
+
+      // Select the clicked row
+      row.classList.add('selected-row');
+
+      // Populate form fields with row data
+      document.getElementById('machine_name').value = row.cells[0].innerText;
+      document.getElementById('username').value = row.cells[1].innerText;
+      document.getElementById('password').value = row.cells[2].innerText; // Populate password
+      document.getElementById('ip').value = row.cells[3].innerText;
+      document.getElementById('db_file_path').value = row.cells[4].innerText;
+
+      // Set the SQL Query selection if it exists
+      const sqlQuerySelect = document.getElementById('sql_query');
+      const sqlQueryText = row.cells[5].innerText;
+      Array.from(sqlQuerySelect.options).forEach(option => {
+          if (option.text === sqlQueryText) {
+              option.selected = true;
+          }
+      });
+  }
+
+  function showContextMenu(event, rowId) {
+    event.preventDefault();
+    selectedRowId = rowId;
+
+    const contextMenu = document.getElementById("contextMenu");
+    contextMenu.style.display = "block";
+    contextMenu.style.left = `${event.pageX}px`;
+    contextMenu.style.top = `${event.pageY}px`;
+  }
+
+  function hideContextMenu() {
+    document.getElementById("contextMenu").style.display = "none";
+  }
+
+  function deleteRow() {
+    if (selectedRowId) {
+      fetch(`/delete_remote_machine/${selectedRowId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (response.ok) {
+          // Remove the row from the table
+          const row = document.querySelector(`tr[oncontextmenu="showContextMenu(event, '${selectedRowId}')"]`);
+          row.remove();
+          hideContextMenu();
+          alert('Record deleted successfully.');
+        } else {
+          alert('Failed to delete the record.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    }
+  }
+
+
+  // Hide context menu on click outside
+  document.addEventListener("click", function(event) {
+    const contextMenu = document.getElementById("contextMenu");
+    if (!contextMenu.contains(event.target)) {
+      hideContextMenu();
+    }
+  });
+</script>
+
+{% endblock %}

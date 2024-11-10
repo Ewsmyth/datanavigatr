@@ -1,0 +1,6 @@
+:root {
+    --bg-color: #ffffff;
+}
+body.dark-mode {
+    --bg-color: #000000;
+}

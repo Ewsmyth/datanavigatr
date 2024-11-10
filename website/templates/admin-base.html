@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin Home Page{% endblock %}</title>
+  {% block css %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-base.css') }}">
+</head>
+<body>
+  <!-- Top banner -->
+  <header>
+    <div class="toggle-div">
+      <button class="toggle-btn" onclick="toggleSidebar()">
+        <img src="{{ url_for('static', filename='images/admin-menu.png') }}" alt="Menu">
+      </button>
+    </div>
+    <div class="banner-div">
+      <h1>{% block banner %}Admin Dashboard{% endblock %}</h1>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Left sidebar -->
+    <nav id="sidebar">
+
+      <!-- Sidebar items with image, name and tooltip -->
+      <div class="nav-item">
+        <a href="{{ url_for('admin.admin_home', username=username) }}" class="links-class">
+          <img src="{{ url_for('static', filename='images/admin-dashboard.png') }}" alt="Dashboard">
+          <span>Dashboard</span>
+        </a>
+        <div class="tooltip">Dashboard</div>
+      </div>
+      <div class="nav-item">
+        <a href="{{ url_for('admin.admin_users', username=username) }}" class="links-class">
+          <img src="{{ url_for('static', filename='images/admin-users.png') }}" alt="Users">
+          <span>Users</span>
+        </a>
+        <div class="tooltip">Users</div>
+      </div>
+      <div class="nav-item">
+        <img src="{{ url_for('static', filename='images/manage-account.png') }}" alt="Account">
+        <span>Settings</span>
+        <div class="tooltip">Settings</div>
+      </div>
+      <div class="nav-item">
+        <img src="{{ url_for('static', filename='images/manage-account.png') }}" alt="Account">
+        <span>Reports</span>
+        <div class="tooltip">Reports</div>
+      </div>
+      <div class="nav-item">
+        <a href="{{ url_for('auth.auth_logout') }}" class="links-class">
+          <img src="{{ url_for('static', filename='images/admin-logout.png') }}" alt="Logout">
+          <span>Logout</span>
+          <div class="tooltip">Logout</div>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main>{% block content %}{% endblock %}</main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/admin-base.js') }}"></script>
+</body>
+</html>
