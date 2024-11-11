@@ -5,10 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 from flask_bcrypt import Bcrypt
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
-limiter = Limiter(key_func=get_remote_address)
 
 auth = Blueprint('auth', __name__)
 
@@ -18,7 +15,6 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 @auth.route('/', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")  # Rate limiting to prevent brute-force attacks
 def auth_login():
     if current_user.is_authenticated:
         # Redirect to the correct dashboard based on user's role

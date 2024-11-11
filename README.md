@@ -1,69 +1,131 @@
-# data-navi-gatr
+# reporter
+ Report what you see
 
-#### If I ever use angle brackets (<>) that means that is a value that you enter. Make sure you change that to apply to your system before you run the commands.
+## Update Ubuntu Server
+```
+sudo apt update && sudo apt upgrade -y
+```
 
-## Before you setup the app you need to do 1 of the following:
-##### From Windows CMD, SSH into your Ubuntu Server
-```
-ssh <your-ubuntu-username>@<server ip>
-```
------
-### Option 1, disable password requirment for the change ownership command for your user.
-```
-sudo visudo
-```
-##### Go to the very bottom of the page where it says "See sudoers(5) for more information on "@inlude" directives:"
-##### Add the following text at the bottom to remove password requirement for chown. After you have added that click "'ctrl' x" and then click "'y'" and then "'enter'"
-```
-<you-ubuntu-username> ALL=(ALL:ALL) NOPASSWD: /bin/chown
-```
-##### You can now exit out of you Ubuntu Server but you will want to keep cmd open
-### Option 2, enable the root user and root user ssh.
-##### Create a password for the root user
+## Enable Root user password and SSH
+#### Set a password for the root user:
 ```
 sudo passwd root
 ```
-##### Enable ssh login for the root user, by editing the sshd_config file
+#### Enable SSh for the root user:
 ```
 sudo nano /etc/ssh/sshd_config
 ```
-##### Find the line the that looks like this:
+##### Find the line that says:
 ```
-#PermitRootLogin no
+PermitRootLogin prohibit-password
 ```
-##### Change it to this
+##### Change it to:
 ```
 PermitRootLogin yes
 ```
-##### Restart the SSh service:
+#### Restart the SSH service:
 ```
-sudo service ssh restart
+sudo systemctl restart ssh
 ```
------
-### Download and install Data Navi Gatr
-##### On the github page click the green dropdown button named ****"Code"**** and then click **"Download ZIP"**. Once it is downloaded go ahead and right click on the zip file and extract the contents. **Set the extract location to the C drive** (other wise you will have to copy the files to the C drive or change the commands below.).
------
-#### There are two different ways to deploy the application, one is to create an exe file and the other is to create a bat file. If you do choose to deploy the app as an exe with pyinstaller then windows security may delete the app because it thinks its malware.
------
-### Option 1, Deploy app as an exe:
-##### First install Python 3.12, this can be found in the Microsoft store
-##### Open CMD and install the necessary packages for the application.
+
+## Install Docker on Ubuntu Server
+
+##### Add Docker's official GPG key:
 ```
-pip install babel tkcalendar paramiko pyinstaller
+sudo apt-get install ca-certificates curl gnupg
 ```
-##### Once those packages are installed use CMD to navigate to the directory where you saved the "Data Navi Gatr" folder.
 ```
-cd "C:\data-navi-gatr-main"
+sudo install -m 0755 -d /etc/apt/keyrings
 ```
-##### Once you are in the Data Navi Gatr folder run the following command:
 ```
-python -m PyInstaller --onefile --noconsole --hidden-import=babel.numbers "Data Navi Gatr.py"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 ```
-##### once that is all done with no errors then you have successfully created the application. if you want to make a Desktop shortcut for the application you can right click on your desktop and select new and then shortcut, then navigate to the "Data Navi Gatr" directory then the "dist" folder then select the main.exe, You can then create a name for your shortcut and the click finish, and now you have a desktop shortcut.
-### Option 2, Deploy app as a bat:
-##### First install Python 3.12, this can be found in the Microsoft store
-##### Open CMD and install the necessary packages for the application.
 ```
-pip install tkcalendar paramiko
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 ```
-#####
+##### Add the repository to Apt sources:
+```
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+```
+sudo apt-get update
+```
+##### Install Docker packages:
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+```
+
+## Install Portainer with Docker
+##### Create a volume that Portainer Server will use to store its database:
+```
+sudo docker volume create portainer_data
+```
+##### Download and install Portainer Server:
+```
+sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+```
+##### Login to the admin account:
+```
+https://<serverip>:9443
+```
+
+## To download and install this application on Docker on Ubuntu Server run the following commands:
+
+##### You can run this command in any directory you want I just run it from the home directory
+```
+sudo git clone https://github.com/Ewsmyth/reporter.git
+```
+##### This should be altered to the proper path to the directory you cloned the git into
+```
+cd data-navi-gatr
+```
+##### The period is for if you are inside the "datanavigatr" directory if you are not then you should replace this with the path to the cloned reporter directory
+```
+sudo docker build -t datanavigatr-image .
+```
+##### Setup a volume for the the database for persistent storage
+```
+sudo docker volume create <volume name>
+```
+###### Example
+```
+sudo docker volume create datanavigatr-data
+```
+```
+sudo docker volume create qdb1-data
+```
+```
+sudo docker volume create sql-queries
+```
+```
+sudo docker volume create downloaded-data
+```
+##### Install DataNaviGatr
+```
+sudo docker run -d -p <port>:<port> --restart=unless-stopped \
+    -e SQLALCHEMY_DATABASE_URI='sqlite:///<path of .db file> \
+    -e SECRET_KEY='<create a key>' \
+    -e HOST='0.0.0.0'
+    -e PORT=<port>
+    -v <volume name>:/var/lib/docker/volumes/<volume name> \
+    reporter-image
+```
+###### Example
+```
+sudo docker run -d -p 80:80 --restart=unless-stopped \
+    -e HOST='0.0.0.0' \
+    -e PORT=80 \
+    -e SECRET_KEY='aabbccddeeffgg' \
+    -e SQLALCHEMY_DATABASE_URI='sqlite:////var/lib/docker/volumes/datanavigatr-data/datanavigatr-data.db' \
+    -e SQLALCHEMY_BINDS_QDB1='sqlite:////var/lib/docker/volumes/qdb1-data/qdb1-data.db' \
+    -e SQL_QUERY_DIR='/var/lib/docker/volumes/sql-queries/' \
+    -e DOWNLOADED_DB_PATH='/var/lib/docker/volumes/downloaded-data/' \
+    -v datanavigatr-data:/var/lib/docker/volumes/datanavigatr-data \
+    -v qdb1-data:/var/lib/docker/volumes/qdb1-data \
+    -v sql-queries:/var/lib/docker/volumes/sql-queries \
+    -v downloaded-data:/var/lib/docker/volumes/downloaded-data \
+datanavigatr-image
+```
