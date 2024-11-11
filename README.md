@@ -1,5 +1,5 @@
-# reporter
- Report what you see
+# DataNaviGatr
+ Ingest, analyze and export data.
 
 ## Update Ubuntu Server
 ```
