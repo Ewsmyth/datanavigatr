@@ -76,11 +76,11 @@ https://<serverip>:9443
 
 ##### You can run this command in any directory you want I just run it from the home directory
 ```
-sudo git clone https://github.com/Ewsmyth/reporter.git
+sudo git clone https://github.com/Ewsmyth/datanavigatr.git
 ```
 ##### This should be altered to the proper path to the directory you cloned the git into
 ```
-cd data-navi-gatr
+cd datanavigatr
 ```
 ##### The period is for if you are inside the "datanavigatr" directory if you are not then you should replace this with the path to the cloned reporter directory
 ```
