@@ -2,6 +2,7 @@ from .models import db  # Import the primary `db` instance
 
 class QDB1(db.Model):  # Bind the model to the qdb1 database
     __bind_key__ = 'qdb1'  # Specify that this model belongs to the 'qdb1' bind
+    __tablename__ = 'qdb1'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Primary key for the table
     TX_USER_ID = db.Column(db.String(1000))
     RX_USER_ID = db.Column(db.String(1000))

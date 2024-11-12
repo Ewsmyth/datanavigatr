@@ -120,7 +120,7 @@ sudo docker run -d -p 80:80 --restart=unless-stopped \
     -e PORT=80 \
     -e SECRET_KEY='aabbccddeeffgg' \
     -e SQLALCHEMY_DATABASE_URI='sqlite:////var/lib/docker/volumes/datanavigatr-data/datanavigatr-data.db' \
-    -e SQLALCHEMY_BINDS_QDB1='sqlite:////var/lib/docker/volumes/qdb1-data/qdb1-data.db' \
+    -e SQLALCHEMY_BINDS_QDB1='sqlite:////var/lib/docker/volumes/qdb1-data/qdb1.db' \
     -e SQL_QUERY_DIR='/var/lib/docker/volumes/sql-queries/' \
     -e DOWNLOADED_DB_PATH='/var/lib/docker/volumes/downloaded-data/' \
     -v datanavigatr-data:/var/lib/docker/volumes/datanavigatr-data \
