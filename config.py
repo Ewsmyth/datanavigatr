@@ -11,3 +11,4 @@ class Config:
     PORT = int(os.environ.get('PORT', 80))
     SQL_QUERY_DIR = os.environ.get('SQL_QUERY_DIR', '/var/lib/docker/volumes/sql-queries/')
     DOWNLOADED_DB_PATH = os.environ.get('DOWNLOADED_DB_PATH', '/var/lib/docker/volumes/downloaded-data/')
+    DOWNLOADED_MEDIA_PATH = os.environ.get('DOWNLOADED_MEDIA_PATH', '/var/lib/docker/volumes/downloaded-media/')

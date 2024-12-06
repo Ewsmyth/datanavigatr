@@ -16,6 +16,7 @@ def create_app():
     # Ensure necessary directories exist, based on environment variables
     os.makedirs(app.config['SQL_QUERY_DIR'], exist_ok=True)
     os.makedirs(app.config['DOWNLOADED_DB_PATH'], exist_ok=True)
+    os.makedirs(app.config['DOWNLOADED_MEDIA_PATH'], exist_ok=True)
     
     # Initialize database, bcrypt, and other components
     db.init_app(app)

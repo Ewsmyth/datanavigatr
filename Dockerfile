@@ -23,6 +23,7 @@ ENV SQLALCHEMY_DATABASE_URI="sqlite:////var/lib/docker/volumes/datanavigatr-data
 ENV SQLALCHEMY_BINDS_QDB1="sqlite:////var/lib/docker/volumes/qdb1-data/qdb1.db"
 ENV SQL_QUERY_DIR="/var/lib/docker/volumes/sql-queries/"
 ENV DOWNLOADED_DB_PATH="/var/lib/docker/volumes/downloaded-data/"
+ENV DOWNLOADED_MEDIA_PATH="/var/lib/docker/volumes/downloaded-media/"
 ENV HOST="0.0.0.0"
 ENV PORT=80
 

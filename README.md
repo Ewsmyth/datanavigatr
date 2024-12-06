@@ -103,6 +103,9 @@ sudo docker volume create sql-queries
 ```
 sudo docker volume create downloaded-data
 ```
+```
+sudo docker volume create downloaded-media
+```
 ##### Install DataNaviGatr
 ```
 sudo docker run -d -p <port>:<port> --restart=unless-stopped \
@@ -123,9 +126,11 @@ sudo docker run -d -p 80:80 --restart=unless-stopped \
     -e SQLALCHEMY_BINDS_QDB1='sqlite:////var/lib/docker/volumes/qdb1-data/qdb1.db' \
     -e SQL_QUERY_DIR='/var/lib/docker/volumes/sql-queries/' \
     -e DOWNLOADED_DB_PATH='/var/lib/docker/volumes/downloaded-data/' \
+    -e DOWNLOADED_MEDIA_PATH='/var/lib/docker/volumes/downloaded-media/' \
     -v datanavigatr-data:/var/lib/docker/volumes/datanavigatr-data \
     -v qdb1-data:/var/lib/docker/volumes/qdb1-data \
     -v sql-queries:/var/lib/docker/volumes/sql-queries \
     -v downloaded-data:/var/lib/docker/volumes/downloaded-data \
+    -v downloaded-media:/var/lib/docker/volumes/downloaded-media \
 datanavigatr-image
 ```
