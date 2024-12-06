@@ -1,9 +1,9 @@
 from sqlalchemy import text
 from .models import db
+from flask import current_app
 
 def fetch_query_results(start_datetime, end_datetime, where_clause):
     """Fetch query results from the qdb1 database based on time and other filters."""
-
     # Modify the query to include where_clause only if it's not empty
     base_query = """
         SELECT * FROM qdb1
@@ -38,6 +38,20 @@ def fetch_query_results(start_datetime, end_datetime, where_clause):
         column_names = result.keys()
 
         # Convert the rows into dictionaries, mapping columns to values
-        results = [dict(zip(column_names, row)) for row in rows]
+        results = []
+        for row in rows:
+            row_dict = dict(zip(column_names, row))
+            
+            # Transform MEDIA column to include full file paths for display
+            media_files = row_dict.get("MEDIA")
+            if media_files:
+                base_path = current_app.config['DOWNLOADED_MEDIA_PATH']
+                # Split filenames, prepend full path, and generate HTML-safe data
+                media_paths = [
+                    f"/media/{filename.strip()}" for filename in media_files.split(",")
+                ]
+                row_dict["MEDIA"] = media_paths
+
+            results.append(row_dict)
 
     return results

@@ -1,6 +1,6 @@
 import sqlite3
 import paramiko
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify, send_from_directory
 import os
 from flask_login import login_required, current_user
 from .models import db, IngestQuery, User, Mission, MissionMember, UserQuery, RemoteMachine
@@ -8,7 +8,7 @@ from .qdb1 import QDB1 # Import the model for the qdb1 table
 from .decorators import role_required
 from datetime import datetime
 from .utils import translate_parameters
-from .qdb1_operations import fetch_query_results 
+from .qdb1_operations import fetch_query_results
 
 user = Blueprint('user', __name__)
 
@@ -297,6 +297,10 @@ def view_query(username, query_id):
         missions=user_missions, 
         queries=user_queries
     )
+
+@user.route('/media/<path:filename>')
+def serve_media_file(filename):
+    return send_from_directory(current_app.config['DOWNLOADED_MEDIA_PATH'], filename)
 
 @user.route('/<username>/userhome/handleingest/', methods=['POST'])
 @login_required

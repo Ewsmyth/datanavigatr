@@ -3,28 +3,47 @@
 {% block content %}
 <div class="sub-main-content">
   <div class="table-container">
-      <table id="dynamic-table">
-          <thead>
-              <tr id="table-head">
-                {% for header in headers %}
-                  <th data-column="{{ loop.index0 }}">
-                    <h4>{{ header }}</h4>
-                  </th>
-                {% endfor %}
-              </tr>
-          </thead>
-          <tbody class="main-table">
-              {% for row in results %}
-              <tr>
-                {% for value in row.values() %}
-                  <td>
-                    <h4>{{ value }}</h4>
-                  </td>
-                {% endfor %}
-              </tr>
-              {% endfor %}
-          </tbody>
-      </table>
+    <table id="dynamic-table">
+      <thead>
+        <tr id="table-head">
+          {% for header in headers %}
+            <th data-column="{{ loop.index0 }}">
+              <h4>{{ header }}</h4>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody class="main-table">
+        {% for row in results %}
+          <tr>
+            {% for header, value in row.items() %}
+              <td>
+                {% if header == "MEDIA" and value %}
+                  {% for media_file in value %}
+                    {% if media_file.endswith('.png') or media_file.endswith('.jpg') or media_file.endswith('.jpeg') %}
+                      <!-- Render image files -->
+                      <img src="{{ media_file }}" alt="Media" style="max-width: 100px; max-height: 100px;"/>
+                    {% elif media_file.endswith('.mp4') or media_file.endswith('.mov') or media_file.endswith('.avi') %}
+                      <!-- Render video files -->
+                      <video controls style="max-width: 200px; max-height: 200px;">
+                        <source src="{{ media_file }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                      </video>
+                    {% else %}
+                      <!-- Provide a link for unsupported file types -->
+                      <a href="{{ media_file }}" target="_blank">{{ media_file }}</a>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <!-- Render other columns as plain text -->
+                  <h4>{{ value }}</h4>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>        
+    </table>
   </div>
   
   <!-- Pagination controls -->
