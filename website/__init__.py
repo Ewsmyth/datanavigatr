@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from config import Config
 from .models import db, User
-from .create_queries import create_reporter_query
+from .create_queries import create_reporter_query, create_interactify_query, create_vendify_query
 
 bcrypt = Bcrypt()
 
@@ -69,5 +69,7 @@ def create_app():
         db.create_all()
         createAdminUser()
         create_reporter_query()
+        create_vendify_query()
+        create_interactify_query()
 
     return app

@@ -91,6 +91,7 @@ class RemoteMachine(db.Model):
     machine_password = db.Column(db.String(1000))
     machine_ip = db.Column(db.String(255))
     machine_file_path = db.Column(db.String(255))
+    machine_content_file_path = db.Column(db.String(255))
     machine_query = db.Column(db.Integer, db.ForeignKey('ingest_query.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

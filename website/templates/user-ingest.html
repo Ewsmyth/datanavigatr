@@ -72,6 +72,15 @@
       </span>
     </div>
     <div class="label-input-group">
+      <label for="content_file_path">Path to Content:</label>
+      <input type="text" id="content_file_path" name="content_file_path" placeholder="Path to Content Folder...">
+      <div class="info-div"></div>
+      <span class="info-span">
+        <h1>File Path to Content Folder</h1>
+        <p>Enter the file path for location of the content folder. Common example: /var/lib/docker/volumes/path/to/contentFolder.</p>
+      </span>
+    </div>
+    <div class="label-input-group">
       <label for="sql_query">SQL Query:</label>
       <select name="sql_query" id="sql_query" required>
         {% for query in queries %}
@@ -111,6 +120,9 @@
             <h4>DB File Path</h4>
           </th>
           <th>
+            <h4>Content Folder Path</h4>
+          </th>
+          <th>
             <h4>SQL Query</h4>
           </th>
           <th>
@@ -135,6 +147,9 @@
             </td>
             <td>
               <h4>{{ machine.machine_file_path }}</h4>
+            </td>
+            <td>
+              <h4>{{ machine.machine_content_file_path }}</h4>
             </td>
             <td>
               <h4>{{ machine.ingest_query.name if machine.ingest_query else 'N/A' }}</h4>
@@ -170,27 +185,28 @@
   }
 
   function populateForm(row) {
-      // Deselect all rows first
-      document.querySelectorAll('tr.selected-row').forEach(r => r.classList.remove('selected-row'));
+    // Deselect all rows first
+    document.querySelectorAll('tr.selected-row').forEach(r => r.classList.remove('selected-row'));
 
-      // Select the clicked row
-      row.classList.add('selected-row');
+    // Select the clicked row
+    row.classList.add('selected-row');
 
-      // Populate form fields with row data
-      document.getElementById('machine_name').value = row.cells[0].innerText;
-      document.getElementById('username').value = row.cells[1].innerText;
-      document.getElementById('password').value = row.cells[2].innerText; // Populate password
-      document.getElementById('ip').value = row.cells[3].innerText;
-      document.getElementById('db_file_path').value = row.cells[4].innerText;
+    // Populate form fields with row data
+    document.getElementById('machine_name').value = row.cells[0].innerText;
+    document.getElementById('username').value = row.cells[1].innerText;
+    document.getElementById('password').value = row.cells[2].innerText; // Populate password
+    document.getElementById('ip').value = row.cells[3].innerText;
+    document.getElementById('db_file_path').value = row.cells[4].innerText;
+    document.getElementById('content_file_path').value = row.cells[5].innerText; // New field for content_file_path
 
-      // Set the SQL Query selection if it exists
-      const sqlQuerySelect = document.getElementById('sql_query');
-      const sqlQueryText = row.cells[5].innerText;
-      Array.from(sqlQuerySelect.options).forEach(option => {
-          if (option.text === sqlQueryText) {
-              option.selected = true;
-          }
-      });
+    // Set the SQL Query selection if it exists
+    const sqlQuerySelect = document.getElementById('sql_query');
+    const sqlQueryText = row.cells[6].innerText; // Updated to match SQL Query field index
+    Array.from(sqlQuerySelect.options).forEach(option => {
+        if (option.text === sqlQueryText) {
+            option.selected = true;
+        }
+    });
   }
 
   function showContextMenu(event, rowId) {

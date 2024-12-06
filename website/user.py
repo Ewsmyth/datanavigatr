@@ -104,22 +104,27 @@ def save_remote_machine(username):
     server_ip = request.form.get('ip')
     db_file_path = request.form.get('db_file_path')
     sql_query = request.form.get('sql_query')
+    content_file_path = request.form.get('content_file_path')
 
-    # Input validation (optional, but recommended)
+    # Input validation
     if not (ssh_username and ssh_password and server_ip and db_file_path and sql_query):
         flash('All fields are required to save parameters', 'error')
         return redirect(url_for('user.user_ingest', username=username))
-
+    
     # Create a new RemoteMachine entry
     new_remote_machine = RemoteMachine(
         author_id=current_user.id,
-        machine_name=remote_machine_name,  # Adjust if you have a specific naming pattern
+        machine_name=remote_machine_name,
         machine_username=ssh_username,
         machine_password=ssh_password,
         machine_ip=server_ip,
         machine_file_path=db_file_path,
-        machine_query=sql_query  # Ensure sql_query matches the ID type expected in the model
+        machine_query=sql_query
     )
+
+    # Conditionally set content_file_path if provided
+    if content_file_path:
+        new_remote_machine.machine_content_file_path = content_file_path
 
     # Save to the database
     db.session.add(new_remote_machine)
@@ -302,6 +307,7 @@ def handle_ingest(username):
     ssh_username = request.form.get('username')
     ssh_password = request.form.get('password')
     db_file_path = request.form.get('db_file_path')
+    media_file_path = request.form.get('content_file_path')  # New input for media files
     sql_query_path = request.form.get('sql_query')  # Get the file path for the SQL query
 
     # Read the SQL query from the file
@@ -309,7 +315,8 @@ def handle_ingest(username):
         sql_query = f.read()
 
     try:
-        run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query)
+        # Run the ingestion process
+        run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, media_file_path, sql_query)
         flash("Query executed and data ingested successfully into qdb1.", "success")
     except Exception as e:
         # Log the error to the console and flash it
@@ -318,9 +325,9 @@ def handle_ingest(username):
 
     return redirect(url_for('user.user_ingest', username=username))
 
-def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
-    """Establish SSH connection, run SQL query on remote db, compare with existing qdb1 data, and insert non-duplicate rows."""
-    
+
+def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, media_file_path, sql_query):
+    """Establish SSH connection, fetch .db and media files, run SQL query, and ingest data."""
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     conn = None
@@ -332,9 +339,9 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
         # Use SFTP to fetch the remote .db file
         sftp = ssh.open_sftp()
 
-        # Check if the remote file exists and has the correct permissions
+        # Check and download the .db file
         try:
-            sftp.stat(db_file_path)  # This will raise an error if the file does not exist or has no permissions
+            sftp.stat(db_file_path)  # This will raise an error if the file does not exist
         except FileNotFoundError:
             raise Exception(f"The file {db_file_path} does not exist on the remote server.")
         except PermissionError:
@@ -343,10 +350,33 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
         # Retrieve the download path from the app configuration
         local_temp_dir = current_app.config['DOWNLOADED_DB_PATH']
         local_db_path = os.path.join(local_temp_dir, os.path.basename(db_file_path))  # Temporary local copy
-        
-        # Download the file
+
+        # Download the .db file
         sftp.get(db_file_path, local_db_path)
         print(f"Downloaded database to {local_db_path}")
+
+        # Check and download media files if media_file_path is provided
+        if media_file_path:
+            try:
+                sftp.stat(media_file_path)  # Check if the directory exists
+            except FileNotFoundError:
+                raise Exception(f"The directory {media_file_path} does not exist on the remote server.")
+            except PermissionError:
+                raise Exception(f"Permission denied to access {media_file_path} on the remote server.")
+
+            # Local media directory
+            local_media_dir = os.path.join(current_app.config['DOWNLOADED_MEDIA_PATH'], os.path.basename(media_file_path))
+            os.makedirs(local_media_dir, exist_ok=True)  # Ensure the directory exists
+
+            # List and download media files
+            media_files = sftp.listdir(media_file_path)
+            for file in media_files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi')):  # Add other extensions as needed
+                    remote_file_path = os.path.join(media_file_path, file)
+                    local_file_path = os.path.join(local_media_dir, file)
+                    sftp.get(remote_file_path, local_file_path)
+                    print(f"Downloaded media file: {file}")
+
         sftp.close()
 
         # Connect to the downloaded .db file and run the SQL query
@@ -355,8 +385,7 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
         cursor.execute(sql_query)
         new_data = cursor.fetchall()
 
-        # Now we have the new data, let's check for duplicates in the qdb1 table
-
+        # Insert non-duplicate rows into the qdb1 table
         for row in new_data:
             # Check if this row already exists in the qdb1 table
             exists = QDB1.query.filter_by(
@@ -389,7 +418,6 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
                 # print(f"Duplicate row found, skipping: {row}")
                 continue
 
-            # Otherwise, insert the new row into the qdb1 table
             qdb1_record = QDB1(
                 TX_USER_ID=row[0],
                 RX_USER_ID=row[1],
@@ -416,7 +444,6 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
             )
             db.session.add(qdb1_record)
 
-        # Commit all the new records to the qdb1 table
         db.session.commit()
 
     except paramiko.SSHException as e:
@@ -427,7 +454,6 @@ def run_ssh_sql_query(ip, ssh_username, ssh_password, db_file_path, sql_query):
         if conn:
             conn.close()
         ssh.close()
-
 
 @user.route('/<username>/userhome/update_account', methods=['POST'])
 @login_required
