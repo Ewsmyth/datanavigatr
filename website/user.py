@@ -11,6 +11,8 @@ from .utils import translate_parameters
 from .qdb1_operations import fetch_query_results
 import xlsxwriter
 from io import BytesIO
+import requests
+
 
 user = Blueprint('user', __name__)
 
@@ -304,40 +306,48 @@ def view_query(username, query_id):
 def serve_media_file(filename):
     return send_from_directory(current_app.config['DOWNLOADED_MEDIA_PATH'], filename)
 
-@user.route('/export-excel', methods=['POST'])
-@login_required
-@role_required('user')
-def export_excel_with_images():
-    # Fetch data and media paths (mocked here for example purposes)
-    data = request.json.get('data')  # Expected: [{'col1': value1, 'MEDIA': ['/path/to/image1.png', ...]}, ...]
+@user.route("/export-excel", methods=["POST"])
+def export_excel():
+    data = request.json  # Expecting `headers` and `rows`
+    headers = data.get("headers", [])
+    rows = data.get("rows", [])
 
-    # Create an Excel file in memory
     output = BytesIO()
-    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    workbook = xlsxwriter.Workbook(output, {"in_memory": True})
     worksheet = workbook.add_worksheet()
 
     # Write headers
-    headers = ['Column1', 'MEDIA']
     for col_num, header in enumerate(headers):
         worksheet.write(0, col_num, header)
 
-    # Write data rows
-    for row_num, row in enumerate(data, start=1):
-        worksheet.write(row_num, 0, row.get('col1', ''))  # Example column
-        media_files = row.get('MEDIA', [])
-
-        for media_file in media_files:
-            if media_file.endswith(('.png', '.jpg', '.jpeg')):
-                image_path = os.path.join(current_app.config['DOWNLOADED_MEDIA_PATH'], media_file.lstrip('/'))
-                if os.path.exists(image_path):
-                    # Insert image into the Excel cell
-                    worksheet.insert_image(row_num, 1, image_path, {'x_scale': 0.5, 'y_scale': 0.5})  # Scale image
+    # Write rows and add images
+    for row_num, row in enumerate(rows, start=1):
+        for col_num, header in enumerate(headers):
+            cell_value = row.get(header, "")
+            if isinstance(cell_value, list):  # Check if it's a list of image URLs
+                for img_num, img_url in enumerate(cell_value):
+                    # Fetch image from URL and insert it
+                    try:
+                        img_data = requests.get(img_url, stream=True).content
+                        img_path = f"/tmp/image_{row_num}_{col_num}_{img_num}.png"
+                        with open(img_path, "wb") as f:
+                            f.write(img_data)
+                        worksheet.insert_image(row_num, col_num, img_path, {"x_scale": 0.5, "y_scale": 0.5})
+                        os.remove(img_path)  # Clean up temp image
+                    except Exception as e:
+                        print(f"Failed to load image {img_url}: {e}")
+            else:
+                worksheet.write(row_num, col_num, cell_value)
 
     workbook.close()
     output.seek(0)
 
-    # Send file to client
-    return send_file(output, as_attachment=True, download_name="export_with_images.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="table_export.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
 @user.route('/<username>/userhome/handleingest/', methods=['POST'])
 @login_required

@@ -27,10 +27,48 @@ function paginateTable() {
 paginateTable();
 
 function exportTableToExcel() {
-    const table = document.getElementById('dynamic-table');
-    const workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-    XLSX.writeFile(workbook, "table_export.xlsx");
+    const table = document.getElementById("dynamic-table");
+    const headers = Array.from(table.querySelectorAll("thead th h4")).map(
+        (header) => header.textContent.trim()
+    );
+
+    const rows = Array.from(table.querySelectorAll("tbody tr")).map((row) => {
+        const cells = row.querySelectorAll("td");
+        const rowData = {};
+        cells.forEach((cell, index) => {
+            const header = headers[index];
+            if (cell.querySelector("img")) {
+                // If the cell contains an image, capture the image source
+                rowData[header] = Array.from(cell.querySelectorAll("img")).map(
+                    (img) => img.src
+                );
+            } else {
+                // For other fields, capture the text
+                rowData[header] = cell.textContent.trim();
+            }
+        });
+        return rowData;
+    });
+
+    // Send data to the backend for Excel generation
+    fetch("/export-excel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ headers, rows }),
+    })
+        .then((response) => response.blob())
+        .then((blob) => {
+            // Trigger download of the generated Excel file
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "table_export.xlsx";
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => console.error("Error exporting table:", error));
 }
+
 
 // Column resizing logic
 const tableHead = document.getElementById('table-head');
@@ -220,50 +258,4 @@ function escapeHTMLSelective(unsafe) {
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;");
     });
-}
-function getMediaColumnIndex() {
-    const headers = Array.from(document.querySelectorAll('#dynamic-table thead th h4'));
-    return headers.findIndex(header => header.textContent.trim().toUpperCase() === 'MEDIA');
-}
-
-function exportTableToExcel() {
-    const mediaColumnIndex = getMediaColumnIndex();
-    if (mediaColumnIndex === -1) {
-        console.error("MEDIA column not found. Ensure the column is named 'MEDIA'.");
-        return;
-    }
-
-    const tableData = []; // Prepare table data from the DOM
-    const rows = document.querySelectorAll('#dynamic-table tbody tr');
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const rowData = {};
-        cells.forEach((cell, index) => {
-            if (index === mediaColumnIndex) {
-                const images = cell.querySelectorAll('img');
-                rowData['MEDIA'] = Array.from(images).map(img => img.src);
-            } else {
-                rowData[`col${index + 1}`] = cell.textContent.trim();
-            }
-        });
-        tableData.push(rowData);
-    });
-
-    // Send data to the backend
-    fetch('/export-excel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: tableData }),
-    })
-    .then(response => response.blob())
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "table_export_with_images.xlsx";
-        a.click();
-        window.URL.revokeObjectURL(url);
-    })
-    .catch(err => console.error('Error exporting Excel:', err));
 }
