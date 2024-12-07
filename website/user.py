@@ -11,7 +11,9 @@ from .utils import translate_parameters
 from .qdb1_operations import fetch_query_results
 import xlsxwriter
 from io import BytesIO
-import requests
+import zipfile
+from werkzeug.utils import secure_filename
+
 
 
 user = Blueprint('user', __name__)
@@ -306,52 +308,61 @@ def view_query(username, query_id):
 def serve_media_file(filename):
     return send_from_directory(current_app.config['DOWNLOADED_MEDIA_PATH'], filename)
 
-@user.route("/export-excel", methods=["POST"])
-def export_excel():
-    print("Export route called.")  # Log route call
+@user.route("/export-zip", methods=["POST"])
+def export_zip():
     data = request.json
-    print("Received data:", data)  # Log received data
-
     headers = data.get("headers", [])
     rows = data.get("rows", [])
-    print("Extracted headers:", headers)  # Log extracted headers
-    print("Extracted rows:", rows)  
 
-    output = BytesIO()
-    workbook = xlsxwriter.Workbook(output, {"in_memory": True})
+    # Paths
+    media_dir = current_app.config['DOWNLOADED_MEDIA_PATH']  # Path to media files
+    temp_dir = "/tmp"  # Temporary directory for file generation
+
+    # Step 1: Generate the Excel file
+    excel_output = BytesIO()
+    workbook = xlsxwriter.Workbook(excel_output, {"in_memory": True})
     worksheet = workbook.add_worksheet()
 
     # Write headers
     for col_num, header in enumerate(headers):
         worksheet.write(0, col_num, header)
 
-    # Write rows and add images
+    # Write rows and add media filenames in the MEDIA column
     for row_num, row in enumerate(rows, start=1):
         for col_num, header in enumerate(headers):
             cell_value = row.get(header, "")
-            if isinstance(cell_value, list):  # Check if it's a list of image URLs
-                for img_num, img_url in enumerate(cell_value):
-                    # Fetch image from URL and insert it
-                    try:
-                        img_data = requests.get(img_url, stream=True).content
-                        img_path = f"/tmp/image_{row_num}_{col_num}_{img_num}.png"
-                        with open(img_path, "wb") as f:
-                            f.write(img_data)
-                        worksheet.insert_image(row_num, col_num, img_path, {"x_scale": 0.5, "y_scale": 0.5})
-                        os.remove(img_path)  # Clean up temp image
-                    except Exception as e:
-                        print(f"Failed to load image {img_url}: {e}")
+            if isinstance(cell_value, list):  # List of media filenames
+                media_filenames = ", ".join(cell_value)
+                worksheet.write(row_num, col_num, media_filenames)
             else:
                 worksheet.write(row_num, col_num, cell_value)
 
     workbook.close()
-    output.seek(0)
+    excel_output.seek(0)
 
+    # Step 2: Prepare the ZIP file
+    zip_output = BytesIO()
+    with zipfile.ZipFile(zip_output, "w", zipfile.ZIP_DEFLATED) as zipf:
+        # Add Excel file to the ZIP
+        zipf.writestr("table_export.xlsx", excel_output.read())
+
+        # Add media files to the ZIP
+        for row in rows:
+            media_files = row.get("MEDIA", [])
+            if isinstance(media_files, list):
+                for filename in media_files:
+                    file_path = os.path.join(media_dir, secure_filename(filename))
+                    if os.path.exists(file_path):
+                        zipf.write(file_path, os.path.join("media", filename))
+
+    zip_output.seek(0)
+
+    # Step 3: Return the ZIP file
     return send_file(
-        output,
+        zip_output,
         as_attachment=True,
-        download_name="table_export.xlsx",
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        download_name="export.zip",
+        mimetype="application/zip",
     )
 
 @user.route('/<username>/userhome/handleingest/', methods=['POST'])

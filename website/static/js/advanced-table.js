@@ -26,8 +26,8 @@ function paginateTable() {
 
 paginateTable();
 
-function exportTableToExcel() {
-    console.log("Export function triggered."); // Log function call
+function exportTableToZip() {
+    console.log("Export function triggered.");
 
     const table = document.getElementById("dynamic-table");
     if (!table) {
@@ -38,7 +38,7 @@ function exportTableToExcel() {
     const headers = Array.from(table.querySelectorAll("thead th h4")).map(
         (header) => header.textContent.trim()
     );
-    console.log("Extracted headers:", headers); // Log headers
+    console.log("Extracted headers:", headers);
 
     const rows = Array.from(table.querySelectorAll("tbody tr")).map((row) => {
         const cells = row.querySelectorAll("td");
@@ -46,50 +46,48 @@ function exportTableToExcel() {
         cells.forEach((cell, index) => {
             const header = headers[index];
             if (cell.querySelector("img")) {
-                const images = Array.from(cell.querySelectorAll("img")).map((img) => img.src);
-                rowData[header] = images;
-                console.log(`Extracted images for header '${header}':`, images); // Log image sources
+                // Extract image filenames
+                const filenames = Array.from(cell.querySelectorAll("img")).map((img) =>
+                    img.src.split("/").pop()
+                );
+                rowData[header] = filenames;
+                console.log(`Extracted filenames for header '${header}':`, filenames);
             } else {
-                const cellText = cell.textContent.trim();
-                rowData[header] = cellText;
-                console.log(`Extracted text for header '${header}':`, cellText); // Log cell text
+                rowData[header] = cell.textContent.trim();
+                console.log(`Extracted text for header '${header}':`, rowData[header]);
             }
         });
-        console.log("Extracted row data:", rowData); // Log row data
         return rowData;
     });
 
-    console.log("Final table data to send:", { headers, rows }); // Log final payload
+    console.log("Final table data to send:", { headers, rows });
 
-    // Send data to the backend for Excel generation
-    fetch("/export-excel", {
+    // Send data to the backend for ZIP file generation
+    fetch("/export-zip", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ headers, rows }),
     })
         .then((response) => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`); // Log non-OK responses
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            console.log("Backend responded successfully."); // Log successful response
+            console.log("Backend responded successfully.");
             return response.blob();
         })
         .then((blob) => {
-            // Trigger download of the generated Excel file
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "table_export.xlsx";
+            a.download = "export.zip";
             a.click();
             window.URL.revokeObjectURL(url);
-            console.log("Excel file download initiated."); // Log download initiation
+            console.log("ZIP file download initiated.");
         })
         .catch((error) => {
-            console.error("Error exporting table:", error); // Log fetch errors
+            console.error("Error exporting table:", error);
         });
 }
-
-
 
 // Column resizing logic
 const tableHead = document.getElementById('table-head');
