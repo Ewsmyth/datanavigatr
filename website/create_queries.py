@@ -314,6 +314,16 @@ def create_vendify_query():
                 print("No Vendify ingest query, attempting to create Vendify Query.")
 
                 query_code = """
+                    WITH DistinctMedia AS (
+                        SELECT 
+                            post_id,
+                            GROUP_CONCAT(media_url, ', ') AS distinct_media_urls
+                        FROM (
+                            SELECT DISTINCT post_id, media_url
+                            FROM media
+                        )
+                        GROUP BY post_id
+                    )
                     SELECT
                         user.id || '<vendifyID>' AS TX_USER_ID,
                         NULL AS RX_USER_ID,
@@ -331,7 +341,13 @@ def create_vendify_query():
                         NULL AS LOCATION,
                         NULL AS FINANCE_ID,
                         post.id || '<vendifyObj>' AS CONTENT_ID,
-                        GROUP_CONCAT(media.media_url || ', ' || post.cover_photo_url, ', ') AS MEDIA,
+                        COALESCE(DistinctMedia.distinct_media_urls, '') || 
+                        CASE 
+                            WHEN post.cover_photo_url IS NOT NULL THEN 
+                                ', ' || post.cover_photo_url 
+                            ELSE 
+                                '' 
+                        END AS MEDIA,
                         NULL AS GROUP_PARTICIPANTS,
                         NULL AS GROUP_CHAT_NAME,
                         post.title AS CONTENT,
@@ -339,7 +355,7 @@ def create_vendify_query():
                         post.created_at AS INITIAL_TIME
                     FROM post
                     JOIN user ON post.author_id = user.id
-                    LEFT JOIN media ON post.id = media.post_id
+                    LEFT JOIN DistinctMedia ON post.id = DistinctMedia.post_id
                     GROUP BY post.id
 
                     UNION ALL
@@ -397,7 +413,7 @@ def create_vendify_query():
                         strftime('%Y-%m-%d %H:%M:%S', user.updated_at) AS UP_TIME,
                         user.created_at AS INITIAL_TIME
                     FROM user
-                    ORDER BY up_time DESC;
+                    ORDER BY UP_TIME DESC;
                     """
 
                 sql_query_dir = current_app.config.get('SQL_QUERY_DIR')
