@@ -27,10 +27,18 @@ function paginateTable() {
 paginateTable();
 
 function exportTableToExcel() {
+    console.log("Export function triggered."); // Log function call
+
     const table = document.getElementById("dynamic-table");
+    if (!table) {
+        console.error("Table element not found!");
+        return;
+    }
+
     const headers = Array.from(table.querySelectorAll("thead th h4")).map(
         (header) => header.textContent.trim()
     );
+    console.log("Extracted headers:", headers); // Log headers
 
     const rows = Array.from(table.querySelectorAll("tbody tr")).map((row) => {
         const cells = row.querySelectorAll("td");
@@ -38,17 +46,20 @@ function exportTableToExcel() {
         cells.forEach((cell, index) => {
             const header = headers[index];
             if (cell.querySelector("img")) {
-                // If the cell contains an image, capture the image source
-                rowData[header] = Array.from(cell.querySelectorAll("img")).map(
-                    (img) => img.src
-                );
+                const images = Array.from(cell.querySelectorAll("img")).map((img) => img.src);
+                rowData[header] = images;
+                console.log(`Extracted images for header '${header}':`, images); // Log image sources
             } else {
-                // For other fields, capture the text
-                rowData[header] = cell.textContent.trim();
+                const cellText = cell.textContent.trim();
+                rowData[header] = cellText;
+                console.log(`Extracted text for header '${header}':`, cellText); // Log cell text
             }
         });
+        console.log("Extracted row data:", rowData); // Log row data
         return rowData;
     });
+
+    console.log("Final table data to send:", { headers, rows }); // Log final payload
 
     // Send data to the backend for Excel generation
     fetch("/export-excel", {
@@ -56,7 +67,13 @@ function exportTableToExcel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ headers, rows }),
     })
-        .then((response) => response.blob())
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`); // Log non-OK responses
+            }
+            console.log("Backend responded successfully."); // Log successful response
+            return response.blob();
+        })
         .then((blob) => {
             // Trigger download of the generated Excel file
             const url = window.URL.createObjectURL(blob);
@@ -65,9 +82,13 @@ function exportTableToExcel() {
             a.download = "table_export.xlsx";
             a.click();
             window.URL.revokeObjectURL(url);
+            console.log("Excel file download initiated."); // Log download initiation
         })
-        .catch((error) => console.error("Error exporting table:", error));
+        .catch((error) => {
+            console.error("Error exporting table:", error); // Log fetch errors
+        });
 }
+
 
 
 // Column resizing logic

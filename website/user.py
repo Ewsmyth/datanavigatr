@@ -308,9 +308,14 @@ def serve_media_file(filename):
 
 @user.route("/export-excel", methods=["POST"])
 def export_excel():
-    data = request.json  # Expecting `headers` and `rows`
+    print("Export route called.")  # Log route call
+    data = request.json
+    print("Received data:", data)  # Log received data
+
     headers = data.get("headers", [])
     rows = data.get("rows", [])
+    print("Extracted headers:", headers)  # Log extracted headers
+    print("Extracted rows:", rows)  
 
     output = BytesIO()
     workbook = xlsxwriter.Workbook(output, {"in_memory": True})
